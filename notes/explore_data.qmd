@@ -1,0 +1,178 @@
+---
+title: "Explore Data"
+format: html
+editor: visual
+---
+
+## Read in Data
+
+Packages:
+
+```{r}
+library(here)
+library(readxl)
+library(phyloseq)
+library(janitor)
+library(tidyverse)
+```
+
+### Metadata
+
+```{r}
+metadata <- read_xlsx(here("data/data-copy_4-11/For Ellen/metadata.xlsx"), skip = 1,
+                      col_types = c(rep("text", 9), "numeric")) %>% 
+  clean_names() %>% 
+  rename(dec_isolate_id = dec_isolate_id_s,
+         sequenced_16s = x16s_r_rna_amplicon_sequenced_from_whole_stool) %>% 
+  mutate(alternate_metagenome_id = ifelse(alternate_metagenome_id == "NA", NA, alternate_metagenome_id)) %>% 
+  mutate(dec_isolate_id = ifelse(dec_isolate_id == "NA", NA, dec_isolate_id)) %>% 
+  mutate(sequenced_16s = sequenced_16s == "yes",
+         dec_isolate_whole_genome_sequenced = dec_isolate_whole_genome_sequenced == "yes",
+         shotgun_metagenome_sequenced_from_whole_stool = shotgun_metagenome_sequenced_from_whole_stool == "yes")
+  
+head(metadata)
+```
+
+```{r}
+sum(!is.na(metadata$alternate_metagenome_id))
+sum(metadata$shotgun_metagenome_sequenced_from_whole_stool)
+sum(metadata$sequenced_16s)
+sum(metadata$diarrhea == "Case")
+```
+
+Data Description:
+
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Variable                                      | Description                                                              | Notes                                                                                                                                                                                                                                                   |
++===============================================+==========================================================================+=========================================================================================================================================================================================================================================================+
+| sample_id                                     | unique identifier                                                        |                                                                                                                                                                                                                                                         |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| alternate_metagenome_id                       | links metagenome ID to sample ID for samples sequenced                   | 103 samples                                                                                                                                                                                                                                             |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| sequenced_16s                                 | binary (yes/no to TRUE/FALSE)                                            | 358 samples                                                                                                                                                                                                                                             |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| dec_isolate_whole_genome_sequenced            | binary (yes/no to TRUE/FALSE)                                            | 182 samples                                                                                                                                                                                                                                             |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ```                                           | linkes dec isolate ID to sample ID                                       |                                                                                                                                                                                                                                                         |
+| dec_isolate_id                                |                                                                          |                                                                                                                                                                                                                                                         |
+| ```                                           |                                                                          |                                                                                                                                                                                                                                                         |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ```                                           | binary (yes/no to TRUE/FALSE)                                            | 103 samples                                                                                                                                                                                                                                             |
+| shotgun_metagenome_sequenced_from_whole_stool |                                                                          |                                                                                                                                                                                                                                                         |
+| ```                                           |                                                                          |                                                                                                                                                                                                                                                         |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| diarrhea                                      | Case/Control symptomatic status                                          | 195 cases                                                                                                                                                                                                                                               |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| dec_infection                                 | Infected/Uninfected status                                               | 182 infected                                                                                                                                                                                                                                            |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| dec_pathotype                                 | see notes for key, can contain multiple (up to three in data) pathotypes | enterotoxigenic E. coli (ETEC), typical and atypical enteropathogenic E. coli (tEPEC and aEPEC, respectively), enterohemmorhagic E. coli (EHEC), enteroinvasive E. coli (EIEC), enteroaggregative E. coli (EAEC), and diffusely adherent E. coli (DAEC) |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| participant_age                               | age in years (at study entry)                                            | 2 missing                                                                                                                                                                                                                                               |
++-----------------------------------------------+--------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: Metadata Notes:
+
+### 16S rRNA amplicon data
+
+#### alpha diversity
+
+```{r}
+alpha_diversity_16s <- read_csv(here("data/data-copy_4-11/For Ellen/16S rRNA amplicon data/alpha diversity/16S_alpha_diversity.csv")) %>% 
+  select(-`...1`) %>% 
+  clean_names()
+
+```
+
+Match with metadata:
+
+```{r}
+setdiff(alpha_diversity_16s$sample, metadata$sample_id)
+setdiff(filter(metadata, sequenced_16s == T)$sample_id, alpha_diversity_16s$sample)
+```
+
+8 Samples ("B105" "B237" "B315" "E196" "Q057" "Q104" "Q215" "R052") have 16s data but not metadata.
+
+| Variable  | Description                               | Notes                                                                                                                                                                 |
+|-----------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| sample    | unique identifier                         | matches sample_id in metadata                                                                                                                                         |
+| diversity | Type of metric                            | 3 options: Species richness, Shannon diversity, Simpson diversity                                                                                                     |
+| observed  | Observed Diversity                        | Always equals estimator for species richness. Estimator and observed differ slightly for Shannon and Simpson. Some preprocessing? Probably used estimator for models. |
+| estimator | Estimated Diversity (using iNEXT package) |                                                                                                                                                                       |
+| s_e       | standard error                            |                                                                                                                                                                       |
+| lcl       | confidence interval lower limit?          | Not using Wald Type                                                                                                                                                   |
+| ucl       | confidence interval upper limit?          | Not using Wald Type                                                                                                                                                   |
+
+### Taxonomy
+
+Phyloseq object
+
+```{r}
+phyloseq_obj_16s <- read_rds("../data/data-copy_4-11/For Ellen/16S rRNA amplicon data/taxonomy/phyloseq_obj_16S.rds")
+```
+
+Contains four objects:
+
+-   OTU Table
+    -   229x358 table.
+        -   Columns are Sample IDs of 16s samples
+
+        -   Rows are OTU (operational taxonomic unit) identifiers (taxa)
+-   Sample Data
+    -   Has a ton of data on participants, unclear if I'm supposed to have access to this? Labels are in Spanish.
+-   Tax Table
+    -   229x7 table
+    -   Maps OTU identifiers to Kingdom, Phlyum, Class, Order, Family, Genus, Species
+    -   Does not map all the way to species for all taxa.
+-   Phylogentic tree, constructed via some method? Relates taxa?
+
+### Metagenome Data
+
+#### Functional Genes
+
+metagenome_func_genes_annotated_functions.csv
+
+-   Contains 6221x104 table. First column is an identifier ("K00014" for example), next 103 columns correspond to sample IDs that we did metagenome sequencing for. They are formated as "{sample_id}\_prodigal_MG_contigs_blastn"
+
+-   What are cell entries: relative abundances? Don't sum to 1.
+
+The folder KEGG mapping maps from the identifiers in "metagenome_func_genes_annotated_functions.csv" to functional gene descriptions.
+
+Pathway annot further reduces 131 functions 32 functions. Probably use these 32 for testing?
+
+Will have to further explore this mapping.
+
+```{r}
+metagenome_func_genes_annotated_functions <- read_csv(here("data/data-copy_4-11/For Ellen/Metagenome data/functional genes/metagenome_func_genes_annotated_functions.csv"))
+metagenome_func_genes_annotated_functions %>% 
+  pull(B101_prodigal_MG_contigs_blastn) %>% 
+  sum()/100
+pathway_annot <- read_csv(here("data/data-copy_4-11/For Ellen/Metagenome data/functional genes/KEGG mapping/pathway_annot.csv"))
+unique(pathway_annot$Secondary)
+```
+
+#### Virulence Factors
+
+```{r}
+VFDB_tab_trans <- read_csv("../data/data-copy_4-11/For Ellen/Metagenome data/virulence factors/VFDB_tab_trans.csv")
+
+VFDB_tab_trans %>% 
+  summarise(across(ends_with("out"), sum))
+```
+
+-   Again, first column is an identifier
+
+-   Nex 103 columns match with sSubject ID
+
+```{r}
+phyloseq_obj_metagenome <- read_rds(here("data/data-copy_4-11/For Ellen/Metagenome data/taxonomy/phyloseq_obj_metagenome.rds"))
+otu_table(phyloseq_obj_metagenome) %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  summarise(across(everything(), sum))
+```
+
+## Questions:
+
+-   8 Samples ("B105" "B237" "B315" "E196" "Q057" "Q104" "Q215" "R052") have 16s data but not metadata.
+-   What are the entries of metagenome_func_genes_annotated_functions.csv? Percent relative abundance? Mean of all relative abundances that match a function? Why do they sum more than 1?

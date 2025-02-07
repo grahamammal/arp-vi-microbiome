@@ -1,0 +1,230 @@
+---
+title: "Analyze Results"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(kableExtra)
+```
+
+## Summary Information
+
+Let's make a table describing how many samples were performed of each type.
+
+```{r}
+metadata <- read_csv(here("data/formatted_data/cleaned_metadata.csv"))
+```
+
+```{r}
+# metadata %>% 
+#   filter(sequenced_16s) %>%  
+#   summarise(total_samples = n(),
+#             diarrhea_pos = sum(diarrhea),
+#             dec_pos = sum(dec_infection == "Infected"))
+# metadata %>% 
+#   filter(shotgun_metagenome_sequenced_from_whole_stool) %>%  
+#   summarise(total_samples = n(),
+#             diarrhea_pos = sum(diarrhea),
+#             dec_pos = sum(dec_infection == "Infected"))
+#   mutate(alpha_diversity = ifelse(measurement == "16S rRNA", 3, 1),
+#          taxa_abundance = ifelse(measurement == "16S rRNA", 229, 164),
+#          functional_gene = ifelse(measurement == "16S rRNA", 0, 3076),
+#          virulence_gene = ifelse(measurement == "16S rRNA", 0, 299))
+```
+
+## Results:
+
+```{r}
+extract_results_table <- function(results_list) {
+  ests <- map_dbl(results_list, list(1, "est"))
+  ci_s <- map(results_list, list(1, "ci"))
+  p_values <- map_dbl(results_list, list(1, "p_value"))
+  
+  results_table <- tibble(variable_group = map_chr(results_list, names),
+                              est = ests, 
+                              ci_lower = map_dbl(ci_s, 1),
+                              ci_upper = map_dbl(ci_s, 2),
+                              p_value = p_values) %>% 
+    mutate(significant_uncorrected = factor(p_value < 0.05, levels = c("FALSE", "TRUE")))
+  
+  results_table
+}
+
+make_vimp_plot <- function(results_table) {
+  results_table %>% 
+    ggplot(aes(y = reorder(variable_group, est), 
+               color = significant_uncorrected)) +
+    geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper, color = significant_uncorrected), show.legend = TRUE) +
+    geom_point(aes(x = est, color = significant_uncorrected), show.legend = TRUE) +
+    labs(y = NULL, x = "Increase in AUC", color = "Signficant (Naive)") +
+    scale_color_manual(drop = FALSE, values = c("#E69F00", "#009E73")) +
+    theme_minimal()
+}
+
+variable_sets_16s <- read_rds(here("data/variable_sets_16s.rds"))
+variable_sets_16s_class <- tibble(variable_group = names(variable_sets_16s), class = c(rep("Family", 30), rep("Phylum", 9), rep("Other", 2)))
+
+variable_sets_16s_dec <- read_rds(here("data/variable_sets_16s_dec.rds"))
+
+variable_sets_16s_dec_class <- tibble(variable_group = names(variable_sets_16s_dec), class = c(rep("Family", 30), rep("Phylum", 9), rep("Other", 3)))
+
+variable_sets_metagenome <- read_rds(here("data/variable_sets_metagenome.rds"))
+
+variable_sets_metagenome_class <- tibble(variable_group = names(variable_sets_metagenome), class = c(rep("Phylum", 19), rep("Functional Genes", 32), rep("Other", 4)))
+
+```
+
+## 16S Results
+
+Load results in
+
+```{r}
+results_table_16s <- list.files(path = here("results/results-16s-caret3/"), pattern = ".RDS") %>% 
+  map(~read_rds(str_c(here("results/results-16s-caret3/"), "/", .x))) %>% 
+  extract_results_table() %>% 
+  left_join(variable_sets_16s_class, by = "variable_group")
+```
+
+Make figures
+
+```{r}
+plot_16s_family <- results_table_16s %>% 
+  filter(class == "Family") %>% 
+  make_vimp_plot()
+
+ggsave(here("figures/plot_16s_family.png"), plot = plot_16s_family, height = 4, width = 6)
+
+plot_16s_phylum <- results_table_16s %>% 
+  filter(class == "Phylum") %>% 
+  make_vimp_plot()
+
+ggsave(here("figures/plot_16s_phylum.png"), plot = plot_16s_phylum, height = 4, width = 6)
+
+plot_16s_other <- results_table_16s %>% 
+  filter(class == "Other") %>% 
+  make_vimp_plot() +
+  scale_y_discrete(labels = c("Alpha Diversity Variables", "Taxa Variables"))
+
+ggsave(here("figures/plot_16s_other.png"), plot = plot_16s_other, height = 2, width = 6)
+
+
+```
+
+### DEC
+
+```{r}
+results_table_16s_dec <- list.files(path = here("results/results-16s-dec-filtered2/"), pattern = ".RDS") %>% 
+  map(~read_rds(str_c(here("results/results-16s-dec-filtered2/"), "/", .x))) %>% 
+  extract_results_table() %>% 
+  left_join(variable_sets_16s_dec_class, by = "variable_group")
+```
+
+```{r}
+plot_16s_dec_family <- results_table_16s_dec %>% 
+  filter(class == "Family") %>% 
+  make_vimp_plot()
+ggsave(here("figures/plot_16s_dec_family.png"), plot = plot_16s_dec_family, height = 4, width = 6)
+
+plot_16s_dec_phylum <- results_table_16s_dec %>% 
+  filter(class == "Phylum") %>% 
+  make_vimp_plot()
+ggsave(here("figures/plot_16s_dec_phylum.png"), plot = plot_16s_dec_phylum, height = 4, width = 6)
+
+plot_16s_dec_other <- results_table_16s_dec %>% 
+  filter(class == "Other") %>% 
+  make_vimp_plot() +
+  scale_y_discrete(labels = c("DEC Pathotype", "Taxa Variables", "Alpha Diversity Variables"))
+  
+ggsave(here("figures/plot_16s_dec_other.png"), plot = plot_16s_dec_other, height = 2, width = 6)
+```
+
+ggsave(here("figures/plot_16s_dec_family.png"), plot = plot_16s_dec_family, height = 4, width = 6)Corrected p-values
+
+```{r}
+results_table_16s_dec %>% 
+  mutate(holm_p_value = p.adjust(p_value, method = "holm"))
+```
+
+## Metagenome
+
+```{r}
+results_table_metagenome <- list.files(path = here("results/results-metagenome3/"), pattern = ".RDS") %>% 
+  map(~read_rds(str_c(here("results/results-metagenome3/"), "/", .x))) %>% 
+  extract_results_table() %>% 
+  left_join(variable_sets_metagenome_class, by = "variable_group")
+
+```
+
+```{r}
+
+plot_metagenome_phylum <- results_table_metagenome %>% 
+  filter(class == "Phylum") %>% 
+  make_vimp_plot()
+
+ggsave(here("figures/plot_metagenome_phylum.png"), plot = plot_metagenome_phylum, height = 4, width = 6)
+
+plot_metagenome_functional <- results_table_metagenome %>% 
+  filter(class == "Functional Genes") %>% 
+  make_vimp_plot() 
+
+ggsave(here("figures/plot_metagenome_functional.png"), plot = plot_metagenome_functional, height = 4, width = 6)
+
+plot_metagenome_other <- results_table_metagenome %>% 
+  filter(class == "Other") %>% 
+  make_vimp_plot() +
+  scale_y_discrete(labels = c("Taxa Variables", "Virulence Genes", "Diversity", "Functional Genes"))
+
+ggsave(here("figures/plot_metagenome_other.png"), plot = plot_metagenome_other, height = 2, width = 6)
+
+```
+
+Adjusted P values
+
+```{r}
+results_table_metagenome %>% 
+  mutate(holm_p_value = p.adjust(p_value, method = "holm"))
+```
+
+## P Value Table
+
+P-Value Table
+
+```{r}
+bind_rows(mutate(results_table_16s, data = "16s rRNA"), 
+          mutate(results_table_16s_dec, data = "16s rRNA (DEC)"), 
+          mutate(results_table_metagenome, data = "Shotgun Metagenome")) %>% 
+  group_by(data) %>% 
+  mutate(adjusted_p_value = p.adjust(p_value, method = "holm")) %>% 
+  filter(as.logical(significant_uncorrected)) %>% 
+  mutate(variable_group = case_when(variable_group == "taxa_variables" ~ "Taxa Variables",
+                                    variable_group == "diversity_variables" ~ "Diversity Variables",
+                                    .default = variable_group)) %>% 
+  arrange(data, p_value) %>% 
+  select(data, variable_group, p_value, adjusted_p_value) %>% 
+  mutate(across(is.numeric, ~signif(.x, digits = 2))) %>% 
+  kbl(col.names = c("Data Set", "Variable Set", "p-value", "Adjusted p-value"))
+  
+
+
+```
+
+## Variable Set Summaries
+
+```{r}
+tibble(variable_group = names(variable_sets_16s), size= map_dbl(variable_sets_16s, length)) %>% 
+  left_join(variable_sets_16s_class) %>% 
+  arrange(class, variable_group)
+
+tibble(variable_group = names(variable_sets_16s_dec), size= map_dbl(variable_sets_16s_dec, length)) %>% 
+  left_join(variable_sets_16s_dec_class) %>% 
+  arrange(class, variable_group)
+
+tibble(variable_group = names(variable_sets_metagenome), size= map_dbl(variable_sets_metagenome, length)) %>% 
+  left_join(variable_sets_metagenome_class) %>% 
+  arrange(class, variable_group)
+```
+
+\

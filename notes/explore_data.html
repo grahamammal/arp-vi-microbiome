@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Explore Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="explore_data_files/libs/clipboard/clipboard.min.js"></script>
+<script src="explore_data_files/libs/quarto-html/quarto.js"></script>
+<script src="explore_data_files/libs/quarto-html/popper.min.js"></script>
+<script src="explore_data_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="explore_data_files/libs/quarto-html/anchor.min.js"></script>
+<link href="explore_data_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="explore_data_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="explore_data_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="explore_data_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="explore_data_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Explore Data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="read-in-data" class="level2">
+<h2 class="anchored" data-anchor-id="read-in-data">Read in Data</h2>
+<p>Packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>here() starts at C:/Users/graha/Documents/FilingCabinet/Graduate School/2023-24 (3rd Year)/2023-24 Q3 Spring/ARP/arp-vi-microbiome</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(phyloseq)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'janitor' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'janitor'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    chisq.test, fisher.test</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggplot2' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyr' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'readr' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+</div>
+<section id="metadata" class="level3">
+<h3 class="anchored" data-anchor-id="metadata">Metadata</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="fu">here</span>(<span class="st">"data/data-copy_4-11/For Ellen/metadata.xlsx"</span>), <span class="at">skip =</span> <span class="dv">1</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">col_types =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"text"</span>, <span class="dv">9</span>), <span class="st">"numeric"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">dec_isolate_id =</span> dec_isolate_id_s,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">sequenced_16s =</span> x16s_r_rna_amplicon_sequenced_from_whole_stool) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">alternate_metagenome_id =</span> <span class="fu">ifelse</span>(alternate_metagenome_id <span class="sc">==</span> <span class="st">"NA"</span>, <span class="cn">NA</span>, alternate_metagenome_id)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dec_isolate_id =</span> <span class="fu">ifelse</span>(dec_isolate_id <span class="sc">==</span> <span class="st">"NA"</span>, <span class="cn">NA</span>, dec_isolate_id)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sequenced_16s =</span> sequenced_16s <span class="sc">==</span> <span class="st">"yes"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">dec_isolate_whole_genome_sequenced =</span> dec_isolate_whole_genome_sequenced <span class="sc">==</span> <span class="st">"yes"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">shotgun_metagenome_sequenced_from_whole_stool =</span> shotgun_metagenome_sequenced_from_whole_stool <span class="sc">==</span> <span class="st">"yes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in J120 / R120C10: got 'missing'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Expecting numeric in J138 / R138C10: got 'missing'</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(metadata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 10
+  sample_id alternate_metagenome_id sequenced_16s dec_isolate_whole_genome_seq…¹
+  &lt;chr&gt;     &lt;chr&gt;                   &lt;lgl&gt;         &lt;lgl&gt;                         
+1 B001      MG1                     FALSE         TRUE                          
+2 B006      &lt;NA&gt;                    TRUE          FALSE                         
+3 B011      &lt;NA&gt;                    TRUE          FALSE                         
+4 B012      &lt;NA&gt;                    FALSE         TRUE                          
+5 B019      &lt;NA&gt;                    TRUE          FALSE                         
+6 B022      &lt;NA&gt;                    TRUE          FALSE                         
+# ℹ abbreviated name: ¹​dec_isolate_whole_genome_sequenced
+# ℹ 6 more variables: dec_isolate_id &lt;chr&gt;,
+#   shotgun_metagenome_sequenced_from_whole_stool &lt;lgl&gt;, diarrhea &lt;chr&gt;,
+#   dec_infection &lt;chr&gt;, dec_pathotype &lt;chr&gt;, participant_age_years &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(metadata<span class="sc">$</span>alternate_metagenome_id))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 103</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(metadata<span class="sc">$</span>shotgun_metagenome_sequenced_from_whole_stool)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 103</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(metadata<span class="sc">$</span>sequenced_16s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 358</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(metadata<span class="sc">$</span>diarrhea <span class="sc">==</span> <span class="st">"Case"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 195</code></pre>
+</div>
+</div>
+<p>Data Description:</p>
+<table class="caption-top table">
+<caption>Metadata Notes:</caption>
+<colgroup>
+<col style="width: 12%">
+<col style="width: 20%">
+<col style="width: 66%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sample_id</td>
+<td>unique identifier</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>alternate_metagenome_id</td>
+<td>links metagenome ID to sample ID for samples sequenced</td>
+<td>103 samples</td>
+</tr>
+<tr class="odd">
+<td>sequenced_16s</td>
+<td>binary (yes/no to TRUE/FALSE)</td>
+<td>358 samples</td>
+</tr>
+<tr class="even">
+<td>dec_isolate_whole_genome_sequenced</td>
+<td>binary (yes/no to TRUE/FALSE)</td>
+<td>182 samples</td>
+</tr>
+<tr class="odd">
+<td><pre><code>dec_isolate_id</code></pre></td>
+<td>linkes dec isolate ID to sample ID</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><pre><code>shotgun_metagenome_sequenced_from_whole_stool</code></pre></td>
+<td>binary (yes/no to TRUE/FALSE)</td>
+<td>103 samples</td>
+</tr>
+<tr class="odd">
+<td>diarrhea</td>
+<td>Case/Control symptomatic status</td>
+<td>195 cases</td>
+</tr>
+<tr class="even">
+<td>dec_infection</td>
+<td>Infected/Uninfected status</td>
+<td>182 infected</td>
+</tr>
+<tr class="odd">
+<td>dec_pathotype</td>
+<td>see notes for key, can contain multiple (up to three in data) pathotypes</td>
+<td>enterotoxigenic E. coli (ETEC), typical and atypical enteropathogenic E. coli (tEPEC and aEPEC, respectively), enterohemmorhagic E. coli (EHEC), enteroinvasive E. coli (EIEC), enteroaggregative E. coli (EAEC), and diffusely adherent E. coli (DAEC)</td>
+</tr>
+<tr class="even">
+<td>participant_age</td>
+<td>age in years (at study entry)</td>
+<td>2 missing</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-rrna-amplicon-data" class="level3">
+<h3 class="anchored" data-anchor-id="s-rrna-amplicon-data">16S rRNA amplicon data</h3>
+<section id="alpha-diversity" class="level4">
+<h4 class="anchored" data-anchor-id="alpha-diversity">alpha diversity</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>alpha_diversity_16s <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/data-copy_4-11/For Ellen/16S rRNA amplicon data/alpha diversity/16S_alpha_diversity.csv"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">...1</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+Rows: 1098 Columns: 8
+── Column specification
+──────────────────────────────────────────────────────── Delimiter: "," chr
+(2): sample, Diversity dbl (6): ...1, Observed, Estimator, s.e., LCL, UCL
+ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+Specify the column types or set `show_col_types = FALSE` to quiet this message.
+• `` -&gt; `...1`</code></pre>
+</div>
+</div>
+<p>Match with metadata:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(alpha_diversity_16s<span class="sc">$</span>sample, metadata<span class="sc">$</span>sample_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "B105" "B237" "B315" "E196" "Q057" "Q104" "Q215" "R052"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(<span class="fu">filter</span>(metadata, sequenced_16s <span class="sc">==</span> T)<span class="sc">$</span>sample_id, alpha_diversity_16s<span class="sc">$</span>sample)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+</div>
+<p>8 Samples (“B105” “B237” “B315” “E196” “Q057” “Q104” “Q215” “R052”) have 16s data but not metadata.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 19%">
+<col style="width: 74%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sample</td>
+<td>unique identifier</td>
+<td>matches sample_id in metadata</td>
+</tr>
+<tr class="even">
+<td>diversity</td>
+<td>Type of metric</td>
+<td>3 options: Species richness, Shannon diversity, Simpson diversity</td>
+</tr>
+<tr class="odd">
+<td>observed</td>
+<td>Observed Diversity</td>
+<td>Always equals estimator for species richness. Estimator and observed differ slightly for Shannon and Simpson. Some preprocessing? Probably used estimator for models.</td>
+</tr>
+<tr class="even">
+<td>estimator</td>
+<td>Estimated Diversity (using iNEXT package)</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>s_e</td>
+<td>standard error</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>lcl</td>
+<td>confidence interval lower limit?</td>
+<td>Not using Wald Type</td>
+</tr>
+<tr class="odd">
+<td>ucl</td>
+<td>confidence interval upper limit?</td>
+<td>Not using Wald Type</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="taxonomy" class="level3">
+<h3 class="anchored" data-anchor-id="taxonomy">Taxonomy</h3>
+<p>Phyloseq object</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>phyloseq_obj_16s <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"../data/data-copy_4-11/For Ellen/16S rRNA amplicon data/taxonomy/phyloseq_obj_16S.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Contains four objects:</p>
+<ul>
+<li>OTU Table
+<ul>
+<li>229x358 table.
+<ul>
+<li><p>Columns are Sample IDs of 16s samples</p></li>
+<li><p>Rows are OTU (operational taxonomic unit) identifiers (taxa)</p></li>
+</ul></li>
+</ul></li>
+<li>Sample Data
+<ul>
+<li>Has a ton of data on participants, unclear if I’m supposed to have access to this? Labels are in Spanish.</li>
+</ul></li>
+<li>Tax Table
+<ul>
+<li>229x7 table</li>
+<li>Maps OTU identifiers to Kingdom, Phlyum, Class, Order, Family, Genus, Species</li>
+<li>Does not map all the way to species for all taxa.</li>
+</ul></li>
+<li>Phylogentic tree, constructed via some method? Relates taxa?</li>
+</ul>
+</section>
+<section id="metagenome-data" class="level3">
+<h3 class="anchored" data-anchor-id="metagenome-data">Metagenome Data</h3>
+<section id="functional-genes" class="level4">
+<h4 class="anchored" data-anchor-id="functional-genes">Functional Genes</h4>
+<p>metagenome_func_genes_annotated_functions.csv</p>
+<ul>
+<li><p>Contains 6221x104 table. First column is an identifier (“K00014” for example), next 103 columns correspond to sample IDs that we did metagenome sequencing for. They are formated as “{sample_id}_prodigal_MG_contigs_blastn”</p></li>
+<li><p>What are cell entries: relative abundances? Don’t sum to 1.</p></li>
+</ul>
+<p>The folder KEGG mapping maps from the identifiers in “metagenome_func_genes_annotated_functions.csv” to functional gene descriptions.</p>
+<p>Pathway annot further reduces 131 functions 32 functions. Probably use these 32 for testing?</p>
+<p>Will have to further explore this mapping.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>metagenome_func_genes_annotated_functions <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/data-copy_4-11/For Ellen/Metagenome data/functional genes/metagenome_func_genes_annotated_functions.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+Rows: 6221 Columns: 104
+── Column specification
+──────────────────────────────────────────────────────── Delimiter: "," chr
+(1): ...1 dbl (103): B101_prodigal_MG_contigs_blastn,
+B147_prodigal_MG_contigs_blastn,...
+ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+Specify the column types or set `show_col_types = FALSE` to quiet this message.
+• `` -&gt; `...1`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>metagenome_func_genes_annotated_functions <span class="sc">%&gt;%</span> </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(B101_prodigal_MG_contigs_blastn) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>()<span class="sc">/</span><span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 15.51589</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>pathway_annot <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/data-copy_4-11/For Ellen/Metagenome data/functional genes/KEGG mapping/pathway_annot.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+Rows: 131 Columns: 2
+── Column specification
+──────────────────────────────────────────────────────── Delimiter: "," chr
+(2): ...1, Secondary
+ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+Specify the column types or set `show_col_types = FALSE` to quiet this message.
+• `` -&gt; `...1`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(pathway_annot<span class="sc">$</span>Secondary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "2-Oxocarboxylic acid metabolism"             
+ [2] "Membrane transport"                          
+ [3] "Amino acid metabolism"                       
+ [4] "Carbohydrate metabolism"                     
+ [5] "Translation"                                 
+ [6] "Xenobiotics biodegradation and metabolism"   
+ [7] "Infectious disease: parasitic"               
+ [8] "Signal transduction"                         
+ [9] "Cell motility"                               
+[10] "Infectious disease: bacterial"               
+[11] "Replication and repair"                      
+[12] "Metabolism of other amino acids"             
+[13] "Drug resistance: antimicrobial"              
+[14] "Biosynthesis of other secondary metabolites" 
+[15] "Cellular community - prokaryotes"            
+[16] "Biosynthesis of amino acids"                 
+[17] "Biosynthesis of cofactors"                   
+[18] "Biosynthesis of secondary metabolites"       
+[19] "Metabolism of terpenoids and polyketides"    
+[20] "Lipid metabolism"                            
+[21] "Metabolism of cofactors and vitamins"        
+[22] "Energy metabolism"                           
+[23] "Carbon metabolism"                           
+[24] "Degradation of aromatic compounds"           
+[25] "Fatty acid metabolism"                       
+[26] "Glycan biosynthesis and metabolism"          
+[27] "Metabolic pathways"                          
+[28] "Microbial metabolism in diverse environments"
+[29] "Transport and catabolism"                    
+[30] "Drug resistance: antineoplastic"             
+[31] "Folding, sorting, and degradation"           
+[32] "Nucleotide metabolism"                       </code></pre>
+</div>
+</div>
+</section>
+<section id="virulence-factors" class="level4">
+<h4 class="anchored" data-anchor-id="virulence-factors">Virulence Factors</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>VFDB_tab_trans <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../data/data-copy_4-11/For Ellen/Metagenome data/virulence factors/VFDB_tab_trans.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>New names:
+Rows: 299 Columns: 104
+── Column specification
+──────────────────────────────────────────────────────── Delimiter: "," chr
+(1): ...1 dbl (103): B101_bmtagger_filtered_out, B147_bmtagger_filtered_out,
+B259_bmta...
+ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+Specify the column types or set `show_col_types = FALSE` to quiet this message.
+• `` -&gt; `...1`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>VFDB_tab_trans <span class="sc">%&gt;%</span> </span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">ends_with</span>(<span class="st">"out"</span>), sum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 54
+  B101_bmtagger_filtered_out B147_bmtagger_filtered_out B259_bmtagger_filtered…¹
+                       &lt;dbl&gt;                      &lt;dbl&gt;                    &lt;dbl&gt;
+1                       12.8                       3.15                  0.00951
+# ℹ abbreviated name: ¹​B259_bmtagger_filtered_out
+# ℹ 51 more variables: B293_bmtagger_filtered_out &lt;dbl&gt;,
+#   B312_bmtagger_filtered_out &lt;dbl&gt;, B46_bmtagger_filtered_out &lt;dbl&gt;,
+#   C26_bmtagger_filtered_out &lt;dbl&gt;, C46_bmtagger_filtered_out &lt;dbl&gt;,
+#   C71_bmtagger_filtered_out &lt;dbl&gt;, E119_bmtagger_filtered_out &lt;dbl&gt;,
+#   E130_bmtagger_filtered_out &lt;dbl&gt;, E132_bmtagger_filtered_out &lt;dbl&gt;,
+#   E167_bmtagger_filtered2_out &lt;dbl&gt;, E55_bmtagger_filtered_out &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Again, first column is an identifier</p></li>
+<li><p>Nex 103 columns match with sSubject ID</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>phyloseq_obj_metagenome <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="fu">here</span>(<span class="st">"data/data-copy_4-11/For Ellen/Metagenome data/taxonomy/phyloseq_obj_metagenome.rds"</span>))</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">otu_table</span>(phyloseq_obj_metagenome) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), sum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          sp1         sp2        sp3          sp4         sp5         sp6
+1 0.004512532 0.001707751 0.08538453 0.0006244771 0.007411878 0.002483033
+         sp7       sp8        sp9         sp10         sp11         sp12
+1 0.02684331 0.0106055 0.01030537 0.0009293737 0.0005124212 0.0009705562
+        sp13       sp14         sp15     sp16        sp17         sp18
+1 0.03524862 0.03000022 0.0001328359 16.34336 0.001336544 0.0006895277
+          sp19         sp20     sp21         sp22        sp23        sp24
+1 0.0008590185 0.0002881382 1.288462 0.0007198851 0.003745653 0.006958104
+          sp25         sp26       sp27        sp28       sp29         sp30
+1 0.0006734432 0.0008354899 0.03092167 0.000992455 0.04731513 0.0003389805
+         sp31         sp32        sp33         sp34        sp35         sp36
+1 0.003234542 0.0007387974 0.001509303 0.0004151964 0.003814343 0.0004784707
+         sp37       sp38       sp39       sp40        sp41         sp42
+1 0.002402985 0.00262483 0.04698565 0.01831281 0.009581296 0.0008391655
+         sp43       sp44        sp45         sp46         sp47        sp48
+1 0.005271195 0.01543536 0.002512965 0.0003528968 0.0001804945 0.002360681
+          sp49       sp50         sp51         sp52        sp53     sp54
+1 0.0004038289 0.02172724 0.0009876566 0.0001396414 0.001954498 6.910408
+       sp55         sp56      sp57      sp58        sp59       sp60        sp61
+1 0.0190519 0.0007110333 0.0106679 0.1001914 0.002364774 0.02125207 0.001439659
+        sp62        sp63         sp64       sp65         sp66        sp67
+1 0.08407387 0.002014922 0.0006416648 0.08465092 0.0006616988 0.000295766
+          sp68         sp69        sp70        sp71         sp72       sp73
+1 0.0009775255 0.0008612564 0.002380052 0.001324224 0.0004634894 0.05099778
+         sp74       sp75        sp76         sp77         sp78     sp79
+1 0.004525332 0.00226117 0.003093293 0.0004291564 0.0007103133 1.726875
+       sp80        sp81         sp82        sp83        sp84        sp85
+1 0.1301398 0.002363435 0.0006165394 0.001867581 0.003087886 0.005589033
+         sp86         sp87        sp88        sp89        sp90        sp91
+1 0.001926194 0.0001732798 0.003200834 0.001366258 0.002640419 0.002022254
+        sp92         sp93       sp94        sp95        sp96         sp97
+1 0.00109472 0.0008782588 0.00716786 0.007896292 0.000532636 0.0003236864
+         sp98        sp99      sp100       sp101       sp102       sp103
+1 0.003386992 0.009412921 0.02844981 0.008460585 0.004144139 0.001389606
+       sp104       sp105        sp106       sp107       sp108        sp109
+1 0.03732789 0.001297027 0.0008057756 0.005214859 0.002702401 0.0007246917
+        sp110       sp111      sp112     sp113       sp114       sp115
+1 0.002810339 0.008783826 0.04215184 0.7486706 0.004742984 0.004982775
+        sp116      sp117       sp118        sp119       sp120       sp121
+1 0.003145523 0.04470461 0.004618313 0.0006608409 0.001526398 0.001777523
+      sp122       sp123     sp124   sp125       sp126        sp127       sp128
+1 0.0055517 0.001359435 0.0497301 1.12672 0.000809574 0.0006726173 0.003863582
+        sp129      sp130       sp131     sp132     sp133       sp134
+1 0.004300501 0.04170602 0.004178054 0.0114981 0.0128926 0.004306966
+        sp135        sp136    sp137        sp138      sp139       sp140
+1 0.001004872 0.0001885011 1.373096 0.0001690568 0.02402898 0.007944955
+         sp141      sp142       sp143      sp144       sp145       sp146
+1 0.0001369344 0.02906698 0.008548601 0.05172269 0.001409063 0.007958372
+      sp147      sp148       sp149       sp150        sp151     sp152
+1 0.8044665 0.01994818 0.001037398 0.002488801 0.0002641028 0.7657865
+        sp153       sp154       sp155        sp156        sp157        sp158
+1 0.001060542 0.001061054 0.002050433 0.0002607787 6.276381e-05 0.0004515327
+         sp159   sp160      sp161       sp162       sp163       sp164
+1 0.0004115839 1.21453 0.01540887 0.001328862 0.008548372 0.009203149</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="questions" class="level2">
+<h2 class="anchored" data-anchor-id="questions">Questions:</h2>
+<ul>
+<li>8 Samples (“B105” “B237” “B315” “E196” “Q057” “Q104” “Q215” “R052”) have 16s data but not metadata.</li>
+<li>What are the entries of metagenome_func_genes_annotated_functions.csv? Percent relative abundance? Mean of all relative abundances that match a function? Why do they sum more than 1?</li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
